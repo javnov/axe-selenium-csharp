@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace javnov.Selenium.Axe.Reporter.Model
+namespace javnov.Selenium.Axe.AxeReporter.Model
 {
     public class Node
     {

@@ -18,79 +18,12 @@ namespace javnov.Selenium.Axe
         /// <returns>readable report of accessibility violations found</returns>
         public static string Report(JArray violations)
         {
-            StringBuilder sb = new StringBuilder();
-            sb
-                    .Append("Found ")
-                    .Append(violations.Count)
-                    .Append(" accessibility violations:");
-
-            for (int i = 0; i < violations.Count; i++)
-            {
-                JObject violation = (JObject)violations.ElementAt(i);
-                sb
-                        .Append(System.Environment.NewLine)
-                        .Append(i + 1)
-                        .Append(") ")
-                        .Append(violation["help"]);
-
-                //if (violation["helpUrl"].Count} has("helpUrl"))
-                if (violation["helpUrl"].HasValues)
-                {
-                    string helpUrl = violation["helpUrl"].ToString();
-                    sb.Append(": ")
-                            .Append(helpUrl);
-                }
-
-                JArray nodes = (JArray)violation["nodes"];
-
-                for (int j = 0; j < nodes.Count; j++)
-                {
-                    JObject node = (JObject)nodes[j];
-                    sb
-                            .Append(System.Environment.NewLine)
-                            .Append("  ")
-                            .Append(GetOrdinal(j + 1))
-                            .Append(") ")
-                            .Append(node. .getJSONArray("target"))
-                            .Append(System.Environment.NewLine);
-
-                    JArray all = node.getJSONArray("all");
-                    JArray none = node.getJSONArray("none");
-
-                    for (int k = 0; k < none.length(); k++)
-                    {
-                        all.put(none.getJSONObject(k));
-                    }
-
-                    appendFixes(sb, all, "Fix all of the following:");
-                    appendFixes(sb, node.getJSONArray("any"), "Fix any of the following:");
-                }
-            }
-
-            return sb.ToString();
+            throw new NotImplementedException("Implemented me Perverse lord");
         }
 
         private static void AppendFixes(StringBuilder sb, JArray arr, string heading)
         {
-            if (arr != null && arr.Count > 0)
-            {
-                sb
-                        .Append("    ")
-                        .Append(heading)
-                        .Append(System.Environment.NewLine);
-
-                for (int i = 0; i < arr.Count; i++)
-                {
-                    JObject fix = arr.getJSONObject(i);
-
-                    sb
-                            .Append("      ")
-                            .Append(fix["message"])
-                            .Append(System.Environment.NewLine);
-                }
-
-                sb.Append(System.Environment.NewLine);
-            }
+            throw new NotImplementedException("Implemented me Perverse lord");
         }
 
         private static string GetOrdinal(int number)
