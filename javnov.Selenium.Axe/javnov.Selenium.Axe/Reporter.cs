@@ -12,7 +12,7 @@ namespace javnov.Selenium.Axe
     {
 
         /// <summary>
-        /// 
+        /// Writes a readable report based on the found violations.
         /// </summary>
         /// <param name="violations">JSONArray of violations</param>
         /// <returns>readable report of accessibility violations found</returns>
@@ -26,28 +26,12 @@ namespace javnov.Selenium.Axe
             throw new NotImplementedException("Implemented me Perverse lord");
         }
 
-        private static string GetOrdinal(int number)
-        {
-            String ordinal = "";
-
-            int mod;
-
-            while (number > 0)
-            {
-                mod = (number - 1) % 26;
-                ordinal = (char)(mod + 97) + ordinal;
-                number = (number - mod) / 26;
-            }
-
-            return ordinal;
-        }
-
-        /**
-         * Writes a raw object out to a JSON file with the specified name.
-         * @param name Desired filename, sans extension
-         * @param output Object to write. Most useful if you pass in either the Builder.analyze() response or the
-         *               violations array it contains.
-         */
+        /// <summary>
+        ///Writes a raw object out to a JSON file with the specified name. 
+        /// </summary>
+        /// <param name="name">Desired filename, sans extension</param>
+        /// <param name="output">Object to write. Most useful if you pass in either the Builder.analyze() response or the violations array it contains.</param>
+        /// @author <a href="mailto:jdmesalosada@gmail.com">Julian Mesa</a>
         public static void WriteResults(string name, object output)
         {
             using (StreamWriter writer = new StreamWriter(name + ".json")) { 

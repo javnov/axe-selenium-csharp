@@ -9,15 +9,15 @@ namespace javnov.Selenium.Axe
 {
 
     /**
-	 * Chainable builder for invoking aXe. Instantiate a new Builder and configure testing with the include(),
+	 * Fluent style builder for invoking aXe. Instantiate a new Builder and configure testing with the include(),
 	 * exclude(), and options() methods before calling analyze() to run.
 	 */
     public class AxeBuilder
     {
         private readonly IWebDriver _webDriver;
         private readonly string _scriptContent;
-        private IList<string> _includes;
-        private IList<string> _excludes;
+        private readonly List<string> _includes = new List<string>();
+        private readonly List<string> _excludes = new List<string>();
 
         #region Properties
 
@@ -36,8 +36,6 @@ namespace javnov.Selenium.Axe
 
             _webDriver = webDriver;
             _scriptContent = Resources.axe_min;
-            _includes = new List<string>();
-            _excludes = new List<string>();
         }
 
         /// <summary>
@@ -64,29 +62,22 @@ namespace javnov.Selenium.Axe
             _scriptContent = contentDownloader.GetContent(axeScriptUrl);
         }
 
-        #region Private
-
         private JObject Execute(string command, params object[] args)
         {
-            this._webDriver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(30));
-            Object response = ((IJavaScriptExecutor)this._webDriver).ExecuteAsyncScript(command, args);
+            _webDriver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(30));
+            object response = ((IJavaScriptExecutor)_webDriver).ExecuteAsyncScript(command, args);
             return new JObject(response);
         }
 
-
-        #endregion Private
-
-        #region Public Services
-
         public AxeBuilder Include(string selector)
         {
-            this._includes.Add(selector);
+            _includes.Add(selector);
             return this;
         }
 
         public AxeBuilder Exclude(string selector)
         {
-            this._excludes.Add(selector);
+            _excludes.Add(selector);
             return this;
         }
 
@@ -95,6 +86,7 @@ namespace javnov.Selenium.Axe
         /// </summary>
         /// <param name="context"> A WebElement to test</param>
         /// <returns>An aXe results document</returns>
+        /// @author <a href="mailto:jdmesalosada@gmail.com">Julian Mesa</a>
         public JObject Analyze(IWebElement context)
         {
             string command = string.Format("axe.a11yCheck(arguments[0], {0}, arguments[arguments.length - 1]);", Options);
@@ -105,6 +97,7 @@ namespace javnov.Selenium.Axe
         /// Run aXe against the page.
         /// </summary>
         /// <returns>An aXe results document</returns>
+        /// @author <a href="mailto:jdmesalosada@gmail.com">Julian Mesa</a>
         public JObject Analyze()
         {
             string command;
@@ -128,7 +121,5 @@ namespace javnov.Selenium.Axe
 
             return Execute(command);
         }
-
-        #endregion Public Services
     }
 }
