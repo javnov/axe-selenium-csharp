@@ -1,4 +1,5 @@
 ﻿using javnov.Selenium.Axe.Properties;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using System;
@@ -15,6 +16,7 @@ namespace javnov.Selenium.Axe
     public class AxeBuilder
     {
         private readonly IWebDriver _webDriver;
+        private Injector _injector = null;
         private readonly string _scriptContent;
         private readonly List<string> _includes = new List<string>();
         private readonly List<string> _excludes = new List<string>();
@@ -22,6 +24,14 @@ namespace javnov.Selenium.Axe
         #region Properties
 
         public string Options { get; set; }
+
+        public Injector InjectorX
+        {
+            get
+            {
+                return _injector ?? (_injector = new Injector(_webDriver, new WebClient()));
+            }
+        }
 
         #endregion Properties
 
@@ -36,6 +46,8 @@ namespace javnov.Selenium.Axe
 
             _webDriver = webDriver;
             _scriptContent = Resources.axe_min;
+            Options = "null";
+            InjectorX.Inject(webDriver);
         }
 
         /// <summary>
@@ -60,21 +72,38 @@ namespace javnov.Selenium.Axe
 
             var contentDownloader = new ContentDownloader(webClient);
             _scriptContent = contentDownloader.GetContent(axeScriptUrl);
+            _injector.Inject(webDriver, axeScriptUrl);
         }
 
+        /// <summary>
+        /// Execute the script into the target.
+        /// </summary>
+        /// <param name="command">Script to execute.</param>
+        /// <param name="args"></param>
+        /// @author <a href="mailto:jdmesalosada@gmail.com">Julian Mesa</a>
         private JObject Execute(string command, params object[] args)
         {
             _webDriver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(30));
             object response = ((IJavaScriptExecutor)_webDriver).ExecuteAsyncScript(command, args);
-            return new JObject(response);
+            return new JObject((Dictionary<string, object>)response);
         }
 
+        /// <summary>
+        /// Selectors to include in the validation.
+        /// </summary>
+        /// <param name="selector">Selector.</param>
+        /// <returns>AxeBuilder object.</returns>
         public AxeBuilder Include(string selector)
         {
             _includes.Add(selector);
             return this;
         }
 
+        /// <summary>
+        /// Selectors to exclude in the validation.
+        /// </summary>
+        /// <param name="selector">Selector.</param>
+        /// <returns>AxeBuilder object.</returns>
         public AxeBuilder Exclude(string selector)
         {
             _excludes.Add(selector);

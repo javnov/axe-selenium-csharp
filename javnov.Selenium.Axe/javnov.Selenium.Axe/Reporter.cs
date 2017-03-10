@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using javnov.Selenium.Axe.AxeReporter.Model;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +19,8 @@ namespace javnov.Selenium.Axe
         /// <returns>readable report of accessibility violations found</returns>
         public static string Report(JArray violations)
         {
-            throw new NotImplementedException("Implemented me Perverse lord");
+            List<RootObject> violationsObj = violations.ToObject<List<RootObject>>();
+            return violationsObj.ToString();
         }
 
         private static void AppendFixes(StringBuilder sb, JArray arr, string heading)
