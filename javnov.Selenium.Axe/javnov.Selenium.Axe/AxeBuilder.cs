@@ -1,5 +1,5 @@
 ﻿using javnov.Selenium.Axe.Properties;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using System;
