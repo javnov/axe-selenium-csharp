@@ -30,7 +30,7 @@ namespace javnov.Selenium.Axe
         public void Include(params string[] selectors)
         {
             ValidateParameters(selectors);
-            InitializeIncludeList();
+            InitializeList(_includeList);
             _includeList.Add(selectors);
         }
 
@@ -41,7 +41,7 @@ namespace javnov.Selenium.Axe
         public void Exclude(params string[] selectors)
         {
             ValidateParameters(selectors);
-            InitializeExcludeList();
+            InitializeList(_excludeList);
             _excludeList.Add(selectors);
         }
 
@@ -84,28 +84,10 @@ namespace javnov.Selenium.Axe
             return JsonConvert.SerializeObject(this, jsonSerializerSettings);
         }
 
-        private void InitializeIncludeList()
+        private void InitializeList(List<string[]> listToInitialize)
         {
-            if (_includeList == null)
-            {
-                lock (syncObject)
-                {
-                    if (_includeList == null)
-                        _includeList = new List<string[]>();
-                }
-            }
-        }
-
-        private void InitializeExcludeList()
-        {
-            if (_excludeList == null)
-            {
-                lock (syncObject)
-                {
-                    if (_excludeList == null)
-                        _excludeList = new List<string[]>();
-                }
-            }
+            if (listToInitialize == null)
+                listToInitialize = new List<string[]>();
         }
 
         private static void ValidateParameters(string[] selectors)
