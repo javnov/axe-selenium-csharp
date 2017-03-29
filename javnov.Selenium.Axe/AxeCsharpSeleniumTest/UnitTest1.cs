@@ -11,7 +11,7 @@ namespace AxeCsharpSeleniumTest
     public class UnitTest1
     {
         private IWebDriver _webDriver;
-        private const string targetTestUrl = "https://www.carnival.com/cruise-ships.aspx";
+        private const string targetTestUrl = "https://www.facebook.com/";
 
         [TestInitialize]
         public void Initialize() {
