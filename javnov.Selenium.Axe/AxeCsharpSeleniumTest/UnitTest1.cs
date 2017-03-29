@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using javnov.Selenium.Axe;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium;
+using FluentAssertions;
 
 namespace AxeCsharpSeleniumTest
 {
@@ -32,6 +33,7 @@ namespace AxeCsharpSeleniumTest
             _webDriver.Navigate().GoToUrl(targetTestUrl);
             AxeBuilder axeBuilder = new AxeBuilder(_webDriver);
             var results = axeBuilder.Analyze();
+            results.Should().NotBeNull(nameof(results));
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using javnov.Selenium.Axe.Properties;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using System;
 using System.Net;
@@ -13,20 +12,10 @@ namespace javnov.Selenium.Axe
     /// </summary>
     public class AxeBuilder
     {
-     private Injector _injector = null;
         private readonly IWebDriver _webDriver;
         private readonly IncludeExcludeManager _includeExcludeManager = new IncludeExcludeManager();
 
-	 public string Options { get; set; } = "null";
-        public Injector InjectorX
-
-        {
-            get
-            {
-                return _injector ?? (_injector = new Injector(_webDriver, new WebClient()));
-            }
-        }
-
+    	 public string Options { get; set; } = "null";
 
         /// <summary>
         /// Initialize an instance of <see cref="AxeBuilder"/>
@@ -39,7 +28,7 @@ namespace javnov.Selenium.Axe
             _webDriver = webDriver;
             _webDriver.Inject();
             Options = "null";
-            InjectorX.Inject(webDriver);
+            webDriver.Inject();
         }
 
         /// <summary>
@@ -65,7 +54,10 @@ namespace javnov.Selenium.Axe
 
             if (webClient == null)
                 throw new ArgumentNullException(nameof(webClient));
-            _injector.Inject(webDriver, axeScriptUrl);
+
+            var contentDownloader = new CachedContentDownloader(webClient);
+            _webDriver.Inject(axeScriptUrl, contentDownloader);
+        }
 
         /// <summary>
         /// Execute the script into the target.
@@ -73,6 +65,10 @@ namespace javnov.Selenium.Axe
         /// <param name="command">Script to execute.</param>
         /// <param name="args"></param>
         /// @author <a href="mailto:jdmesalosada@gmail.com">Julian Mesa</a>
+        private JObject Execute(string command, params object[] args)
+        {
+            _webDriver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(30));
+            object response = ((IJavaScriptExecutor)_webDriver).ExecuteAsyncScript(command, args);
             return JObject.FromObject(response);
         }
 
@@ -135,13 +131,6 @@ namespace javnov.Selenium.Axe
             }
 
             return Execute(command);
-        }
-
-        private JObject Execute(string command, params object[] args)
-        {
-            _webDriver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(30));
-            object response = ((IJavaScriptExecutor)_webDriver).ExecuteAsyncScript(command, args);
-            return new JObject(response);
         }
     }
 }
