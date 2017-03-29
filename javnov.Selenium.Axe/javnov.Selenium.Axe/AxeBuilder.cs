@@ -1,7 +1,9 @@
-﻿using javnov.Selenium.Axe.Properties;
+﻿using javnov.Selenium.Axe.AxeReporter.Model;
+using javnov.Selenium.Axe.Properties;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace javnov.Selenium.Axe
@@ -64,7 +66,6 @@ namespace javnov.Selenium.Axe
         /// </summary>
         /// <param name="command">Script to execute.</param>
         /// <param name="args"></param>
-        /// @author <a href="mailto:jdmesalosada@gmail.com">Julian Mesa</a>
         private JObject Execute(string command, params object[] args)
         {
             _webDriver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(30));
@@ -100,7 +101,6 @@ namespace javnov.Selenium.Axe
         /// </summary>
         /// <param name="context"> A WebElement to test</param>
         /// <returns>An aXe results document</returns>
-        /// @author <a href="mailto:jdmesalosada@gmail.com">Julian Mesa</a>
         public JObject Analyze(IWebElement context)
         {
             string command = string.Format("axe.a11yCheck(arguments[0], {0}, arguments[arguments.length - 1]);", Options);
@@ -111,8 +111,7 @@ namespace javnov.Selenium.Axe
         /// Run aXe against the page.
         /// </summary>
         /// <returns>An aXe results document</returns>
-        /// @author <a href="mailto:jdmesalosada@gmail.com">Julian Mesa</a>
-        public JObject Analyze()
+        public List<Violation> Analyze()
         {
             string command;
 
@@ -130,7 +129,8 @@ namespace javnov.Selenium.Axe
                 command = $"axe.a11yCheck(document, {Options}, arguments[arguments.length - 1]);";
             }
 
-            return Execute(command);
+            var violations = Execute(command).SelectToken("violations");
+            return violations.ToObject<List<Violation>>();
         }
     }
 }

@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AxeBuilder.cs" />
+    <Compile Include="AxeReporter\Model\Violation.cs" />
     <Compile Include="CachedContentDownloader.cs" />
     <Compile Include="ContentDownloader.cs" />
     <Compile Include="IContentDownloader.cs" />
@@ -61,9 +62,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Reporter.cs" />
-    <Compile Include="AxeReporter\Model\Any.cs" />
     <Compile Include="AxeReporter\Model\Node.cs" />
-    <Compile Include="AxeReporter\Model\RootObject.cs" />
     <Compile Include="WebDriverExtensions.cs" />
     <Compile Include="WebDriverInjectorExtensions.cs" />
   </ItemGroup>
