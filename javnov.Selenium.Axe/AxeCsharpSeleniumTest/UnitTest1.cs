@@ -15,6 +15,7 @@ namespace AxeCsharpSeleniumTest
         [TestInitialize]
         public void Initialize() {
             _webDriver = new FirefoxDriver();
+            _webDriver.Manage().Window.Maximize();
         }
 
         [TestCleanup()]

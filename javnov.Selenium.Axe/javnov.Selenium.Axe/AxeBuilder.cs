@@ -85,7 +85,7 @@ namespace javnov.Selenium.Axe
         {
             _webDriver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(30));
             object response = ((IJavaScriptExecutor)_webDriver).ExecuteAsyncScript(command, args);
-            return new JObject((Dictionary<string, object>)response);
+            return JObject.FromObject(response);
         }
 
         /// <summary>
