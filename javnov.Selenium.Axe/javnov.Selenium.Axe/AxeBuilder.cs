@@ -3,29 +3,23 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using System;
-using System.Collections.Generic;
 using System.Net;
 
 namespace javnov.Selenium.Axe
 {
-
-    /**
-	 * Fluent style builder for invoking aXe. Instantiate a new Builder and configure testing with the include(),
-	 * exclude(), and options() methods before calling analyze() to run.
-	 */
+    /// <summary>
+    /// Fluent style builder for invoking aXe. Instantiate a new Builder and configure testing with the include(),
+    /// exclude(), and options() methods before calling analyze() to run.
+    /// </summary>
     public class AxeBuilder
     {
+     private Injector _injector = null;
         private readonly IWebDriver _webDriver;
-        private Injector _injector = null;
-        private readonly string _scriptContent;
-        private readonly List<string> _includes = new List<string>();
-        private readonly List<string> _excludes = new List<string>();
+        private readonly IncludeExcludeManager _includeExcludeManager = new IncludeExcludeManager();
 
-        #region Properties
-
-        public string Options { get; set; }
-
+	 public string Options { get; set; } = "null";
         public Injector InjectorX
+
         {
             get
             {
@@ -33,47 +27,45 @@ namespace javnov.Selenium.Axe
             }
         }
 
-        #endregion Properties
 
         /// <summary>
-        /// 
+        /// Initialize an instance of <see cref="AxeBuilder"/>
         /// </summary>
-        /// <param name="webDriver"></param>
-        public AxeBuilder(IWebDriver webDriver)
-        {
+        /// <param name="webDriver">Selenium driver to use</param>
+        public AxeBuilder(IWebDriver webDriver)        {
             if (webDriver == null)
-                throw new ArgumentNullException("webDriver");
+                throw new ArgumentNullException(nameof(webDriver));
 
             _webDriver = webDriver;
-            _scriptContent = Resources.axe_min;
+            _webDriver.Inject();
             Options = "null";
             InjectorX.Inject(webDriver);
         }
 
         /// <summary>
-        /// 
+        /// Initialize an instance of <see cref="AxeBuilder"/>
         /// </summary>
-        /// <param name="webDriver"></param>
-        /// <param name="axeScriptUrl"></param>
+        /// <param name="webDriver">Selenium driver to use</param>
+        /// <param name="axeScriptUrl">aXe script URL</param>
         public AxeBuilder(IWebDriver webDriver, Uri axeScriptUrl) : this(webDriver, axeScriptUrl, new WebClient()) { }
 
         /// <summary>
-        /// 
+        /// Initialize an instance of <see cref="AxeBuilder"/>
         /// </summary>
-        /// <param name="webDriver"></param>
-        /// <param name="axeScriptUrl"></param>
-        /// <param name="webClient"></param>
-        public AxeBuilder(IWebDriver webDriver, Uri axeScriptUrl, WebClient webClient) : this(webDriver)
+        /// <param name="webDriver">Selenium driver to use</param>
+        /// <param name="axeScriptUrl">aXe script URL</param>
+        /// <param name="webClient">Webclient to use to get aXe script's content</param>
+        public AxeBuilder(IWebDriver webDriver, Uri axeScriptUrl, WebClient webClient)
         {
-            if (axeScriptUrl == null)
-                throw new ArgumentNullException("axeScriptUrl");
-            if (webClient == null)
-                throw new ArgumentNullException("webClient");
+            if (webDriver == null)
+                throw new ArgumentNullException(nameof(webDriver));
 
-            var contentDownloader = new ContentDownloader(webClient);
-            _scriptContent = contentDownloader.GetContent(axeScriptUrl);
+            if (axeScriptUrl == null)
+                throw new ArgumentNullException(nameof(axeScriptUrl));
+
+            if (webClient == null)
+                throw new ArgumentNullException(nameof(webClient));
             _injector.Inject(webDriver, axeScriptUrl);
-        }
 
         /// <summary>
         /// Execute the script into the target.
@@ -81,32 +73,29 @@ namespace javnov.Selenium.Axe
         /// <param name="command">Script to execute.</param>
         /// <param name="args"></param>
         /// @author <a href="mailto:jdmesalosada@gmail.com">Julian Mesa</a>
-        private JObject Execute(string command, params object[] args)
-        {
-            _webDriver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(30));
-            object response = ((IJavaScriptExecutor)_webDriver).ExecuteAsyncScript(command, args);
             return JObject.FromObject(response);
         }
 
         /// <summary>
         /// Selectors to include in the validation.
         /// </summary>
-        /// <param name="selector">Selector.</param>
-        /// <returns>AxeBuilder object.</returns>
-        public AxeBuilder Include(string selector)
+        /// <param name="selectors">Any valid CSS selectors</param>
+        /// <returns></returns>
+        public AxeBuilder Include(params string[] selectors)
         {
-            _includes.Add(selector);
+            _includeExcludeManager.Include(selectors);
             return this;
         }
 
         /// <summary>
+        /// Exclude selectors
         /// Selectors to exclude in the validation.
         /// </summary>
-        /// <param name="selector">Selector.</param>
-        /// <returns>AxeBuilder object.</returns>
-        public AxeBuilder Exclude(string selector)
+        /// <param name="selectors">Any valid CSS selectors</param>
+        /// <returns></returns>
+        public AxeBuilder Exclude(params string[] selectors)
         {
-            _excludes.Add(selector);
+            _includeExcludeManager.Exclude(selectors);
             return this;
         }
 
@@ -131,24 +120,28 @@ namespace javnov.Selenium.Axe
         {
             string command;
 
-            if (_includes.Count > 1 || _excludes.Count > 0)
+            if (_includeExcludeManager.HasMoreThanOneSelectorsToIncludeOrSomeToExclude())
             {
-                command = string.Format("axe.a11yCheck({include: [{0}], exclude: [{1}]}, {2}, arguments[arguments.length - 1]);",
-                        "['" + string.Join("'],['", _includes) + "']",
-                        _excludes.Count == 0 ? "" : "['" + string.Join("'],['", _excludes) + "']",
-                        Options);
+                command = $"axe.a11yCheck({_includeExcludeManager.ToJson()}, {Options}, arguments[arguments.length - 1]);";
             }
-
-            else if (_includes.Count == 1)
+            else if (_includeExcludeManager.HasOneItemToInclude())
             {
-                command = string.Format("axe.a11yCheck('{0}', {1}, arguments[arguments.length - 1]);", _includes[0].Replace("'", ""), Options);
+                string itemToInclude = _includeExcludeManager.GetFirstItemToInclude().Replace("'", "");
+                command = $"axe.a11yCheck('{itemToInclude}', {Options}, arguments[arguments.length - 1]);";
             }
             else
             {
-                command = string.Format("axe.a11yCheck(document, {0}, arguments[arguments.length - 1]);", Options);
+                command = $"axe.a11yCheck(document, {Options}, arguments[arguments.length - 1]);";
             }
 
             return Execute(command);
+        }
+
+        private JObject Execute(string command, params object[] args)
+        {
+            _webDriver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(30));
+            object response = ((IJavaScriptExecutor)_webDriver).ExecuteAsyncScript(command, args);
+            return new JObject(response);
         }
     }
 }
