@@ -4,17 +4,20 @@ using javnov.Selenium.Axe;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium;
 using FluentAssertions;
+using RazorEngine;
+using RazorEngine.Templating;
 
 namespace AxeCsharpSeleniumTest
 {
     [TestClass]
-    public class UnitTest1
+    public class IntegrationTests
     {
         private IWebDriver _webDriver;
         private const string targetTestUrl = "https://www.facebook.com/";
 
         [TestInitialize]
-        public void Initialize() {
+        public void Initialize()
+        {
             _webDriver = new FirefoxDriver();
             _webDriver.Manage().Window.Maximize();
         }
@@ -26,14 +29,14 @@ namespace AxeCsharpSeleniumTest
             _webDriver.Dispose();
         }
 
-
         [TestMethod]
-        public void TestMethod1()
+        public void TestAnalyzeTarget()
         {
             _webDriver.Navigate().GoToUrl(targetTestUrl);
             AxeBuilder axeBuilder = new AxeBuilder(_webDriver);
             var results = axeBuilder.Analyze();
             results.Should().NotBeNull(nameof(results));
         }
+
     }
 }

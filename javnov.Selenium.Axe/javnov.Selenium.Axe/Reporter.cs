@@ -1,5 +1,4 @@
-﻿using javnov.Selenium.Axe.AxeReporter.Model;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +18,7 @@ namespace javnov.Selenium.Axe
         /// <returns>readable report of accessibility violations found</returns>
         public static string Report(JArray violations)
         {
-            List<Violation> violationsObj = violations.ToObject<List<Violation>>();
+            List<AxeResultItem> violationsObj = violations.ToObject<List<AxeResultItem>>();
             return violationsObj.ToString();
         }
 
