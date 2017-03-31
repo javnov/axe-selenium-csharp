@@ -30,7 +30,6 @@ namespace javnov.Selenium.Axe
 
             _webDriver = webDriver;
             _webDriver.Inject();
-            webDriver.Inject();
         }
 
         /// <summary>
