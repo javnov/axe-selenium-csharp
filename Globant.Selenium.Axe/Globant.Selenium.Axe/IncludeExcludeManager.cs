@@ -19,31 +19,31 @@ namespace Globant.Selenium.Axe
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        private List<string[]> _includeList;
-        private List<string[]> _excludeList;
+        public List<string[]> Include { get; set; }
+        public List<string[]> Exclude { get; set; }
 
         /// <summary>
         /// Include the given selectors, i.e "#foo", "ul.bar .target", "div"
         /// </summary>
         /// <param name="selectors">Selectors to include</param>
-        public void Include(params string[] selectors)
+        public void IncludeToAnalyzer(params string[] selectors)
         {
             ValidateParameters(selectors);
-            if (_includeList == null)
-                _includeList = new List<string[]>();
-            _includeList.Add(selectors);
+            if (Include == null)
+                Include = new List<string[]>();
+            Include.Add(selectors);
         }
 
         /// <summary>
         /// Include the given selectors, i.e "frame", "div.foo"
         /// </summary>
         /// <param name="selectors">Selectors to exclude</param>
-        public void Exclude(params string[] selectors)
+        public void ExcludeToAnalyzer(params string[] selectors)
         {
             ValidateParameters(selectors);
-            if (_excludeList == null)
-                _excludeList = new List<string[]>();
-            _excludeList.Add(selectors);
+            if (Exclude == null)
+                Exclude = new List<string[]>();
+            Exclude.Add(selectors);
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace Globant.Selenium.Axe
         /// <returns>True or False</returns>
         public bool HasMoreThanOneSelectorsToIncludeOrSomeToExclude()
         {
-            bool hasMoreThanOneSelectorsToInclude = _includeList != null && _includeList.Count > 1;
-            bool hasSelectorsToExclude = _excludeList != null && _excludeList.Count > 0;
+            bool hasMoreThanOneSelectorsToInclude = Include != null && Include.Count > 1;
+            bool hasSelectorsToExclude = Exclude != null && Exclude.Count > 0;
 
             return hasMoreThanOneSelectorsToInclude || hasSelectorsToExclude;
         }
@@ -62,7 +62,7 @@ namespace Globant.Selenium.Axe
         /// Indicate we have one entry on the include list
         /// </summary>
         /// <returns>True or False</returns>
-        public bool HasOneItemToInclude() => _includeList != null && _includeList.Count == 1;
+        public bool HasOneItemToInclude() => Include != null && Include.Count == 1;
 
         /// <summary>
         /// Get first selector of the first entry on include list
@@ -70,10 +70,10 @@ namespace Globant.Selenium.Axe
         /// <returns></returns>
         public string GetFirstItemToInclude()
         {
-            if (_includeList == null || _includeList.Count == 0)
+            if (Include == null || Include.Count == 0)
                 throw new InvalidOperationException("You must add at least one selector to include");
 
-            return _includeList.First().First();
+            return Include.First().First();
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using System;
+using System.Collections.Generic;
 
 namespace Globant.Selenium.Axe
 {
@@ -45,6 +46,16 @@ namespace Globant.Selenium.Axe
 
             AxeBuilder axeBuilder = new AxeBuilder(webDriver, axeBuilderOptions);
             return axeBuilder.Analyze(context);
+        }
+
+        public static AxeResult Analyze(this IWebDriver webDriver, string[] excludeList)
+        {
+            if (webDriver == null)
+                throw new ArgumentNullException(nameof(webDriver));
+
+            AxeBuilder axeBuilder = new AxeBuilder(webDriver);
+            axeBuilder.Exclude(excludeList);
+            return axeBuilder.Analyze();
         }
     }
 }

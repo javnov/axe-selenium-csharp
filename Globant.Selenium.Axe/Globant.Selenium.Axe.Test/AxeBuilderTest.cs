@@ -50,7 +50,7 @@ namespace Globant.Selenium.Axe.Test
             targetLocator.Setup(t => t.DefaultContent()).Returns(driver.Object);
 
             jsExecutor
-                .Setup(js => js.ExecuteAsyncScript(It.IsAny<string>(), It.IsAny<object[]>()))
+                .Setup(js => js.ExecuteScript(It.IsAny<string>(), It.IsAny<object[]>()))
                 .Returns(new
                 {
                     violations = new object[] { },
@@ -62,6 +62,7 @@ namespace Globant.Selenium.Axe.Test
                 });
 
             var builder = new AxeBuilder(driver.Object);
+            builder.WaitForResult = false;
             var result = builder.Analyze();
 
             result.Should().NotBeNull();
